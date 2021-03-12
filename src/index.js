@@ -70,21 +70,50 @@ app.post('/todos', checksExistsUserAccount, (request, response) => {
 });
 
 app.put('/todos/:id', checksExistsUserAccount, (request, response) => {
-  const { title, deadline } = request.body;
+  const { id } = request.params;
   const { user } = request;
+  const { title, deadline } = request.body;
 
-  user.todos.title = title;
-  user.todos.deadline = deadline;
+  const findToDo = user.todos.find((user) => user.id === id);
 
-  return response.status(201).send()
+  if ( !findToDo ){
+    return response.status(404).json({ error: "Todo not found!" })
+  }
+
+  findToDo.title = title;
+  findToDo.deadline = deadline;
+
+  return response.status(201).json(findToDo);
 });
 
 app.patch('/todos/:id/done', checksExistsUserAccount, (request, response) => {
-  // Complete aqui
+  const { id } = request.params;
+  const { user } = request;
+
+  const findToDo = user.todos.find((user) => user.id === id);
+
+  if ( !findToDo ){
+    return response.status(404).json({ error: "Todo not found!" })
+  }
+
+  findToDo.done = true;
+
+  return response.status(201).json(findToDo);
 });
 
 app.delete('/todos/:id', checksExistsUserAccount, (request, response) => {
-  // Complete aqui
+  const { id } = request.params;
+  const { user } = request;
+
+  const findTodo = user.todos.find((user) => user.id === id);
+
+  if ( !findTodo ){
+    return response.status(404).json({ error: "Todo not found!" })
+  }
+
+  user.todos.splice(findTodo, 1);
+
+  return response.status(204).send();
 });
 
 module.exports = app;
